@@ -50,7 +50,7 @@ var EXTENSION_SRC_DIR = "extensions/";
 
 var BASELINE_DIR = BUILD_DIR + "baseline/";
 var MOZCENTRAL_BASELINE_DIR = BUILD_DIR + "mozcentral.baseline/";
-var GENERIC_DIR = BUILD_DIR + "generic/";
+var GENERIC_DIR = BUILD_DIR + "../../react-pdfjs/public/customized-pdfjs/";
 var GENERIC_ES5_DIR = BUILD_DIR + "generic-es5/";
 var COMPONENTS_DIR = BUILD_DIR + "components/";
 var COMPONENTS_ES5_DIR = BUILD_DIR + "components-es5/";

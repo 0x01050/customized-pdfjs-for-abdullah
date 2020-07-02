@@ -108,6 +108,9 @@ class PDFPageView {
     this.annotationLayer = null;
     this.textLayer = null;
     this.zoomLayer = null;
+    this.dotLayer = null;
+    this.dotArray = [];
+    this.newPostPopup = null;
 
     const div = document.createElement("div");
     div.className = "page";
@@ -117,6 +120,81 @@ class PDFPageView {
     this.div = div;
 
     container.appendChild(div);
+  }
+
+  setLongClickCallback (callback, timeout) {
+    var longClickTimer;
+    timeout = timeout || 500;
+    var borderWidth = 9;
+    this.div.onmousedown = this.div.ontouchstart = function(e) {
+      var page = this.id;
+      var rect = this.div.getBoundingClientRect();
+      var x, y;
+      if (e.touches != undefined)
+      {
+        if(e.touches.length > 1)
+        {
+          return;
+        }
+        for(var i = 0; i < e.touches.length; i ++)
+        {
+          var touch = e.touches[i];
+          x = touch.clientX;
+          y = touch.clientY;
+          break;
+        }
+      }
+      else
+      {
+        x = e.clientX;
+        y = e.clientY;
+      }
+      x = x - rect.left - borderWidth;
+      x = x * 100.0 / (rect.width - borderWidth * 2);
+      y = y - rect.top - borderWidth;
+      y = y * 100.0 / (rect.height - borderWidth * 2);
+      if(x >= 0 && y >= 0 && x <= 100 && y <= 100)
+      {
+        longClickTimer = setTimeout(function() {
+          callback(page, x, y);
+        }, timeout);
+      }
+      return true;
+    }.bind(this);
+    this.div.onmouseup = this.div.ontouchend = this.div.ontouchcancel = this.div.onmousemove = this.div.ontouchmove = function(e) {
+      if(e.type === 'mousemove' && e.movementX == 0 && e.movementY == 0)
+        return true;
+      clearTimeout(longClickTimer);
+      return true;
+    };
+  }
+  removePosts() {
+    this.dotArray = [];
+    this.renderPost();
+  }
+  addPost(x, y, post) {
+    this.dotArray.push({
+      x: x, y: y, post: post
+    });
+    this.renderPost();
+  }
+  renderPost() {
+    var dotWidth = 6;
+    this.dotLayer.innerHTML = '';
+    for (var post of this.dotArray) {
+      const dotDiv = document.createElement("div");
+      dotDiv.style.position = 'absolute';
+      dotDiv.style.backgroundColor = 'red';
+      dotDiv.style.borderRadius = '50%';
+      dotDiv.style.width = dotWidth + 'px';
+      dotDiv.style.height = dotWidth + 'px';
+      dotDiv.style.left = 'calc(' + post.x + '% - ' + (dotWidth / 2) + 'px)';
+      dotDiv.style.top = 'calc(' + post.y + '% - ' + (dotWidth / 2) + 'px)';
+      dotDiv.onclick = function(e) {
+        window.top.postMessage({ type: 'viewPost', post: this }, '*');
+      }.bind(post.post);
+      this.dotLayer.appendChild(dotDiv);
+    }
   }
 
   setPdfPage(pdfPage) {
@@ -294,6 +372,9 @@ class PDFPageView {
       this.annotationLayer.cancel();
       this.annotationLayer = null;
     }
+    if (this.dotLayer) {
+      this.dotLayer = null;
+    }
   }
 
   cssTransform(target, redrawAnnotations = false) {
@@ -452,6 +533,17 @@ class PDFPageView {
       );
     }
     this.textLayer = textLayer;
+
+    const dotLayerDiv = document.createElement("div");
+    dotLayerDiv.style.width = canvasWrapper.style.width;
+    dotLayerDiv.style.height = canvasWrapper.style.height;
+    div.appendChild(dotLayerDiv);
+    this.dotLayer = dotLayerDiv;
+    this.renderPost();
+
+    const newPostPopupDiv = document.createElement("div");
+    div.appendChild(newPostPopupDiv);
+    this.newPostPopup = newPostPopupDiv;
 
     let renderContinueCallback = null;
     if (this.renderingQueue) {

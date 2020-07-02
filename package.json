@@ -60,12 +60,19 @@
     "yargs": "^11.1.1"
   },
   "scripts": {
-    "postinstall": "node -e \"require('child_process').execSync('cross-env PUPPETEER_PRODUCT=firefox node node_modules/puppeteer/install.js');\"",
-    "test": "gulp npm-test"
+    "server": "gulp server",
+    "build": "gulp generic",
+    "test": "gulp npm-test",
+    "postinstall": "node -e \"require('child_process').execSync('cross-env PUPPETEER_PRODUCT=firefox node node_modules/puppeteer/install.js');\""
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/mozilla/pdf.js.git"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "dependencies": {
+    "global": "^4.4.0",
+    "gulp-cli": "^2.3.0",
+    "pdfjs-dist": "^2.4.456"
+  }
 }

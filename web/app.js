@@ -2060,6 +2060,35 @@ function webViewerPageRendered(evt) {
     return;
   }
 
+  pageView.setLongClickCallback(function(id, x, y) {
+    window.top.postMessage({ type: 'newPostRequest', page: id, x: x, y: y }, '*');
+  });
+  window.addEventListener('message', function(e) {
+    var data = e.data;
+      if(typeof data === 'object')
+      {
+        switch(data.type)
+        {
+          case 'newPost':
+            if(data.page == pageNumber)
+            {
+              pageView.addPost(data.x, data.y, data.post);
+            }
+            break;
+          case 'setPost':
+            pageView.removePosts();
+            for(var post of data.posts)
+            {
+              if(post.page == pageNumber)
+              {
+                pageView.addPost(post.x, post.y, post.post);
+              }
+            }
+            break;
+        }
+      }
+  });
+
   // Use the rendered page to set the corresponding thumbnail image.
   if (PDFViewerApplication.pdfSidebar.isThumbnailViewVisible) {
     const thumbnailView = PDFViewerApplication.pdfThumbnailViewer.getThumbnail(
