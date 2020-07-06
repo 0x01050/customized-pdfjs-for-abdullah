@@ -2088,6 +2088,7 @@ function webViewerPageRendered(evt) {
         }
       }
   });
+  window.top.postMessage({ type: 'ready' }, '*');
 
   // Use the rendered page to set the corresponding thumbnail image.
   if (PDFViewerApplication.pdfSidebar.isThumbnailViewVisible) {

@@ -179,13 +179,14 @@ class PDFPageView {
     this.renderPost();
   }
   renderPost() {
-    var dotWidth = 6;
+    var dotWidth = 12;
     this.dotLayer.innerHTML = '';
     for (var post of this.dotArray) {
       const dotDiv = document.createElement("div");
       dotDiv.style.position = 'absolute';
       dotDiv.style.backgroundColor = 'red';
       dotDiv.style.borderRadius = '50%';
+      dotDiv.style.opacity = '50%';
       dotDiv.style.width = dotWidth + 'px';
       dotDiv.style.height = dotWidth + 'px';
       dotDiv.style.left = 'calc(' + post.x + '% - ' + (dotWidth / 2) + 'px)';
